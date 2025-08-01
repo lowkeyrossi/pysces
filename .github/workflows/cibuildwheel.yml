@@ -30,9 +30,9 @@ jobs:
           Invoke-WebRequest https://github.com/llvm/llvm-project/releases/download/llvmorg-20.1.8/LLVM-20.1.8-woa64.exe -UseBasicParsing -OutFile LLVM-woa64.exe
           Start-Process -FilePath ".\LLVM-woa64.exe" -ArgumentList "/S" -Wait
           echo "C:\Program Files\LLVM\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-          set CC=clang-cl
-          set FC=flang-new
-          set AR=llvm-ar
+          echo "CC=clang-cl" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          echo "FC=flang-new" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          echo "AR=llvm-ar" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
       - name: (macos-13) Ensure gfortran is in path
         if: matrix.os == 'macos-13'
