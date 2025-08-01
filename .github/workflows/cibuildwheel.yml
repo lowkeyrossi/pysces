@@ -34,19 +34,25 @@ jobs:
       - name: Install Python Deps
         shell: pwsh
         run: |
-          curl -L -o scipy.whl https://anaconda.org/scientific-python-nightly-wheels/scipy/1.17.0.dev0/download/scipy-1.17.0.dev0-cp311-cp311-win_arm64.whl
-          python -m pip install scipy.whl
+          # Download scipy wheel with correct filename
+          curl -L -o scipy-1.17.0.dev0-cp311-cp311-win_arm64.whl https://anaconda.org/scientific-python-nightly-wheels/scipy/1.17.0.dev0/download/scipy-1.17.0.dev0-cp311-cp311-win_arm64.whl
+          
+          # Install scipy from the downloaded wheel
+          python -m pip install scipy-1.17.0.dev0-cp311-cp311-win_arm64.whl
+          
+          # Install other dependencies
           pip install build
-          pip install -r requirements.txt
+          
+          # Create a temporary requirements file without scipy to avoid source build
+          Get-Content requirements.txt | Where-Object { $_ -notmatch "^scipy" } | Out-File -FilePath temp_requirements.txt -Encoding utf8
+          pip install -r temp_requirements.txt
 
       - name: Build and test
         shell: pwsh
-        run: | 
+        run: |
           python -m build
           cd dist
-          pip install /*.whl
-          pysces.test()
-          pysces.test(3)
-          
-
-
+          # Install the built wheel (assuming it's the only .whl file in dist/)
+          pip install (Get-ChildItem *.whl)[0].Name
+          # Run tests (assuming pysces is the module name)
+          python -c "import pysces; pysces.test(); pysces.test(3)"
